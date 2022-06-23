@@ -1,0 +1,46 @@
+main :- 
+  begin(State), 
+  solve(State, Solution, FinalState), 
+  writeln('__________________________________________________________________________________________________________________________________________________________________'),
+  writeln(['Starting state - ', State]),
+  writeln('__________________________________________________________________________________________________________________________________________________________________'),
+  writeln(['The solution - ', Solution]),
+  writeln('__________________________________________________________________________________________________________________________________________________________________'),
+  writeln(['The resulting final state - ', FinalState]),
+  writeln('__________________________________________________________________________________________________________________________________________________________________').
+
+solve(State, [] ,State) :- goal(State).
+solve(State, [Move|Caboose], FinalState) :- s(State, Move, NewState),solve(NewState ,Caboose, FinalState).
+
+goal(state([ ], right, [_,_,_,_],T)) :- T =< 17.
+begin(state([one, two, five, ten], left, [ ], 0)).
+
+unit_speed(one, 1).
+unit_speed(two, 2).
+unit_speed(five, 5).
+unit_speed(ten, 10).
+
+s(state(Group1, left, Group2, F), crosses_the_bridge(N), state(Group4, right, Group6, F2)) :- 
+    selection(Group1, N, Group4), append(Group2, N, Group5), 
+            sort(Group5, Group6), time_goal(N, Fn), F2 is F + Fn, F2 =< 17.
+    
+s(state(Group1, right, Group2, F), crosses_the_bridge(N), state(Group4, left, Group6, F2)) :-
+    selection(Group2, N, Group5), append(Group1, N, Group4), 
+            sort(Group5, Group6), time_goal(N, Fn), F2 is F + Fn, F2 =< 17.
+
+
+
+selection(L, [Selected], L2) :- select(Selected, L, L2).
+selection(L, [Selected1, Selected2], L2) :- select(Selected1, L, New), select(Selected2, New, L2), Selected1 @< Selected2.
+
+time_goal([X], F) :- unit_speed(X, F).
+time_goal([X, Y], F2) :- unit_speed(X, F1), unit_speed(Y, F2), F1 < F2.
+time_goal([X, Y], F1) :- unit_speed(X, F1), unit_speed(Y, F2), F1 >= F2.
+
+
+
+
+?- findall(_,main,_).
+
+
+
